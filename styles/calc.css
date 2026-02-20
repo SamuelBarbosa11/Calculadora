@@ -1,0 +1,203 @@
+.calc {
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), 0px 188px 52px rgba(0, 0, 0, 0.01), 0px 120px 48px rgba(0, 0, 0, 0.04), 0px 68px 41px rgba(0, 0, 0, 0.15), 0px 30px 30px rgba(0, 0, 0, 0.26), 0px 8px 17px rgba(0, 0, 0, 0.29), inset 0px 6px 8px rgba(255, 255, 255, 0.1), inset 0px -4px 5px rgba(0, 0, 0, 0.22);
+
+    padding: 3.375rem 2rem 2rem;
+    margin-inline: auto;
+
+    & .painel {
+        width: 18rem;
+        height: 5.375rem;
+        padding-inline: 1.125rem 1.375rem;
+        justify-self: end;
+        margin-bottom: 1.625rem;
+
+        & .last-operation {
+            text-align: end;
+            margin-bottom: .5rem;
+        }
+
+        & .result {
+            display: flex;
+            align-items: center;
+
+            & h1 {
+                margin-left: auto;
+            }
+
+            & .symbol{
+                width: 1.25rem;
+                height: 1.25rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                & div {
+                    width: 1rem;
+                    height: 2px;
+                    border-radius: 1px;
+                    background-color: var(--placeholder-color);
+                }
+            }
+        }
+    }
+
+    & .keybord {
+        width: 18.25rem;
+        height: 23rem;
+
+        font: 400 1.5rem var(--ff-rubik);
+        letter-spacing: -0.02em;
+
+        display: grid;
+        gap: .75rem;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+        grid-template-areas: 
+            "CE C C divisao"
+            "n7 n8 n9 multiplicacao"
+            "n4 n5 n6 menos"
+            "n1 n2 n3 mais"
+            "n0 n0 virgula equal"
+        ;
+
+        & button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: .75rem;
+
+            &:not([class]) {
+                background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(255, 255, 255, 0.05) 100%), #2D2A37;
+                box-shadow: 0px 11px 7px rgba(0, 0, 0, 0.01), 0px 7px 7px rgba(0, 0, 0, 0.04), 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 2px 4px rgba(0, 0, 0, 0.26), 0px 0px 2px rgba(0, 0, 0, 0.29), inset 0px 2px 3px rgba(255, 255, 255, 0.06);
+            }
+
+            & .symbol {
+                width: 1.75rem;
+                height: 1.75rem;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                & div {
+                    width: 1.25rem;
+                    height: 2px;
+                    border-radius: 1px;
+                    background-color: var(--white-color);
+                }
+            }
+
+            &#button-CE {
+                grid-area: CE;
+            }
+
+            &#button-C {
+                grid-area: C;
+            }
+
+            &#button-divisao {
+                grid-area: divisao;
+            }
+
+            &#button-7 {
+                grid-area: n7;
+            }
+
+            &#button-8 {
+                grid-area: n8;
+            }
+
+            &#button-9 {
+                grid-area: n9;
+            }
+
+            &#button-multiplicacao {
+                grid-area: multiplicacao;
+            }
+
+            &#button-4 {
+                grid-area: n4;
+            }
+
+            &#button-5 {
+                grid-area: n5;
+            }
+
+            &#button-6 {
+                grid-area: n6;
+            }
+
+            &#button-menos {
+                grid-area: menos;
+            }
+
+            &#button-1 {
+                grid-area: n1;
+            }
+
+            &#button-2 {
+                grid-area: n2;
+            }
+
+            &#button-3 {
+                grid-area: n3;
+            }
+
+            &#button-mais {
+                grid-area: mais;
+            }
+
+            &#button-0 {
+                grid-area: n0;
+            }
+
+            &#button-virgula {
+                grid-area: virgula;
+                font-size: 2.25rem;
+            }
+
+            &#button-equal {
+                grid-area: equal;
+            }
+        }
+    }
+
+    & .equal {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem;
+    }
+
+    & .mais {
+        position: relative;
+        & div {
+            position: absolute;
+            &:first-child {
+                transform: rotate(90deg);
+            }
+        }
+    }
+
+    & .multiplicacao {
+        position: relative;
+        & div {
+            position: absolute;
+
+            &:first-child {
+                transform: rotate(45deg);
+            }
+            &:last-child {
+                transform: rotate(-45deg);
+            }
+        }
+    }
+
+    & .divisao {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem;
+        & div:first-child, div:last-child {
+            width: .25rem !important;
+            height: .25rem !important;
+            border-radius: 50% !important;
+        }
+    }
+}
