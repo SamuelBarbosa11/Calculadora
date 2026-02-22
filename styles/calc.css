@@ -25,6 +25,7 @@
             & h1 {
                 overflow: scroll;
                 max-width: calc(100% - 1.4rem);
+                height: 3.125rem;
             }
 
             position: relative;
@@ -36,7 +37,6 @@
                 display: flex;
                 justify-content: center;
                 align-items: center;
-
 
                 & div {
                     width: 1rem;
