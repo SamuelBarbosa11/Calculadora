@@ -56,7 +56,11 @@ h2 {
     color: var(--white-color);
 }
 
-h3 {
+ul {
+    list-style: none;
+}
+
+li {
     font: 400 1.25rem/1.4 var(--ff-rubik);
     letter-spacing: -0.02em;
     color: var(--white-color);

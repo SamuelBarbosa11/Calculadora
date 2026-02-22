@@ -2,6 +2,7 @@ const visor = document.querySelector('#value');
 const botoes = document.querySelectorAll('.keybord button');
 const last_operation = document.querySelector('.last-operation p');
 const small_symbols = document.querySelectorAll('.result .symbol');
+const history = document.querySelector('ul.operations');
 
 let operacao = '';
 let res = 0;
@@ -29,13 +30,21 @@ botoes.forEach(botao => {
             adicionarNumero(textoBotao);
         }
 
+        if (textoBotao === 'C') { apagarDigito(); }
+        if (textoBotao === 'CE') { limparVisor(); }
+
         if (tipoOperacao && tipoOperacao !== 'equal') {
             const valorAtual = visor.innerText.replace(',', '.');
             operacao = valorAtual; // Armazena o primeiro número
             
             // Define o operador matemático real
-            const operadores = { mais: '+', menos: '-', multiplicacao: '*', divisao: '/' };
-            operacao += operadores[tipoOperacao];
+            const operadores = { 
+                mais: '+', 
+                menos: '-', 
+                multiplicacao: '*', 
+                divisao: '/' 
+            };
+            operacao += ` ${operadores[tipoOperacao]} `;
             
             esconderSimbolos();
             document.querySelector(`.result .symbol.${tipoOperacao}`).classList.remove('hidden');
@@ -44,21 +53,9 @@ botoes.forEach(botao => {
             aguardandoSegundoNumero = true;
         }
 
-        if (textoBotao === 'C') { C(); }
-        if (textoBotao === 'CE') { CE();}
-
-        if (tipoOperacao) {
-            esconderSimbolos();
-            
-            const simboloAlvo = document.querySelector(`.result .symbol.${tipoOperacao}`);
-            
-            if (simboloAlvo) {
-                simboloAlvo.classList.remove('hidden');
-            }
-
-            if (tipoOperacao === 'equal') {
-                exibirResultado();
-            }
+        if (tipoOperacao === 'equal') {
+            exibirResultado();
+            add_history();
         }
     });
 });
@@ -77,7 +74,7 @@ function adicionarNumero(numero) {
     scroll_right();
 }
 
-function C() {
+function apagarDigito() {
     if (visor.innerText.length <= 1 || visor.innerText === "0") {
         visor.innerText = "0";
     } else {
@@ -86,7 +83,7 @@ function C() {
     scroll_right();
 }
 
-function CE() {
+function limparVisor() {
     visor.innerText = '0';
     last_operation.textContent = '';
     esconderSimbolos();
@@ -103,4 +100,10 @@ function exibirResultado() {
 
 function esconderSimbolos() {
     small_symbols.forEach(s => s.classList.add('hidden'));
+}
+
+function add_history() {
+    const new_history = document.createElement('li');
+    new_history.innerText = last_operation.innerText + ` = ${visor.innerText}`;
+    history.prepend(new_history);
 }

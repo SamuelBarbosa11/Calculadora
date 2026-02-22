@@ -5,4 +5,12 @@
     & h2 {
         margin-block: 2.5rem 1rem;
     }
+    & ul {
+        height: calc(100% - 5.625rem - 2.5rem);
+        overflow: scroll;
+    }
+
+    & li {
+        margin-bottom: .75rem;
+    }
 }
