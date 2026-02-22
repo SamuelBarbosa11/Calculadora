@@ -4,16 +4,19 @@ const last_operation = document.querySelector('.last-operation p');
 const small_symbols = document.querySelectorAll('.result .symbol');
 const history = document.querySelector('ul.operations');
 
-let operacao = '';
-let res = 0;
-
 window.onload = scroll_right();
 // mantem o scroll por padrao na extrema direita
 function scroll_right() {
     visor.scrollLeft = visor.scrollWidth;
 }
 
-let aguardandoSegundoNumero = false;
+function scroll_down() {
+    visor.scrollTop = visor.scrollHeight;
+}
+
+let primeiroNumero = null;
+let operadorAtual = null;
+let resetarVisor = false;
 
 botoes.forEach(botao => {
     botao.addEventListener('click', () => {
@@ -21,64 +24,98 @@ botoes.forEach(botao => {
         const tipoOperacao = botao.getAttribute('operation');
 
         // Verificar se o botão clicado é um número ou a vírgula
-        if (!isNaN(textoBotao) || textoBotao === ',') {
-            // Se clicamos em uma operação antes, o novo número deve limpar o visor
-            if (aguardandoSegundoNumero) {
-                visor.innerText = "0";
-                aguardandoSegundoNumero = false;
-            }
-            adicionarNumero(textoBotao);
-        }
+        if (!isNaN(textoBotao) || textoBotao === ',') { adicionarNumero(textoBotao); }
 
         if (textoBotao === 'C') { apagarDigito(); }
         if (textoBotao === 'CE') { limparVisor(); }
 
         if (tipoOperacao && tipoOperacao !== 'equal') {
-            const valorAtual = visor.innerText.replace(',', '.');
-            operacao = valorAtual; // Armazena o primeiro número
+            let textoLimpo = visor.innerText.replace(',', '.');
+            // Se o visor estiver vazio ou for só uma vírgula, assume 0
+            if (textoLimpo === "" || textoLimpo === ".") textoLimpo = "0";
             
-            // Define o operador matemático real
-            const operadores = { 
-                mais: '+', 
-                menos: '-', 
-                multiplicacao: '*', 
-                divisao: '/' 
+            const valorAtual = parseFloat(textoLimpo);
+
+            if (isNaN(valorAtual)) return;
+
+            if (primeiroNumero !== null && operadorAtual !== null && !resetarVisor) {
+                const resultadoParcial = calcular(primeiroNumero, valorAtual, operadorAtual);
+                
+                // Se o cálculo falhar (ex: divisão por zero), resetamos
+                if (resultadoParcial === "Erro") {
+                    limparVisor();
+                    visor.innerText = "Erro";
+                    return;
+                }
+                
+                visor.innerText = resultadoParcial.toString().replace('.', ',');
+                primeiroNumero = resultadoParcial;
+            } else {
+                // Se for a primeira vez, apenas guarda o número do visor
+                primeiroNumero = valorAtual;
+            }
+
+            // Define qual é o novo operador
+            const operadores = {
+                mais: '+',
+                menos: '-',
+                multiplicacao: '*',
+                divisao: '/'
             };
-            operacao += ` ${operadores[tipoOperacao]} `;
-            
+            operadorAtual = operadores[tipoOperacao];
+
+            // Interface
             esconderSimbolos();
             document.querySelector(`.result .symbol.${tipoOperacao}`).classList.remove('hidden');
             
-            // Avisamos ao sistema que o próximo número digitado deve começar do zero
-            aguardandoSegundoNumero = true;
+            resetarVisor = true; // O próximo número digitado deve limpar o visor
         }
 
         if (tipoOperacao === 'equal') {
-            exibirResultado();
-            add_history();
+            if (primeiroNumero !== null && operadorAtual !== null) {
+                const segundoNumero = parseFloat(visor.innerText.replace(',', '.'));
+                const resultadoFinal = calcular(primeiroNumero, segundoNumero, operadorAtual);
+
+                last_operation.innerText = `${primeiroNumero} ${operadorAtual} ${segundoNumero}`;
+                visor.innerText = resultadoFinal.toString().replace('.', ',');
+                
+                adicionarHistorico();
+                
+                // Reseta o estado para uma nova conta
+                primeiroNumero = null;
+                operadorAtual = null;
+                resetarVisor = true;
+                esconderSimbolos();
+            }
         }
     });
 });
 
 function adicionarNumero(numero) {
-    // Evitar duplicidade de sinais
-    if (numero === ',' && /,/.test(visor.innerText)) {return ;}
+    if (resetarVisor) {
+        visor.innerText = (numero === ',' ? '0,' : numero);
+        resetarVisor = false;
+        return;
+    }
 
-    // Se o visor for "0" e não estivermos clicando na vírgula, substitui
+    if (numero === ',' && visor.innerText.includes(',')) return;
+
     if (visor.innerText === '0' && numero !== ',') {
         visor.innerText = numero;
     } else {
-        // Se já tiver algo, concatena
         visor.innerText += numero;
     }
     scroll_right();
 }
 
 function apagarDigito() {
-    if (visor.innerText.length <= 1 || visor.innerText === "0") {
-        visor.innerText = "0";
+    if (visor.innerText.length <= 1) {
+        visor.innerText = '0';
+        esconderSimbolos();
     } else {
-        visor.innerText = visor.innerText.replace(/.$/, '');
+        visor.innerText = visor.innerText.slice(0, -1);
+        // Se após apagar, sobrar apenas "-", reseta para 0
+        if (visor.innerText === "-") visor.innerText = "0";
     }
     scroll_right();
 }
@@ -87,23 +124,31 @@ function limparVisor() {
     visor.innerText = '0';
     last_operation.textContent = '';
     esconderSimbolos();
+    limparHistorico();
     scroll_right();
 }
 
-function exibirResultado() {
-    const valorAtual = visor.innerText.replace(',', '.');
-    operacao += valorAtual;
-    last_operation.innerText = operacao;
-    res = eval(operacao);
-    visor.innerText = res;
+function calcular(n1, n2, operador) {
+    switch (operador) {
+        case '+': return n1 + n2;
+        case '-': return n1 - n2;
+        case '*': return n1 * n2;
+        case '/': return n2 !== 0 ? n1 / n2 : "Erro";
+        default: return n2;
+    }
 }
 
 function esconderSimbolos() {
     small_symbols.forEach(s => s.classList.add('hidden'));
 }
 
-function add_history() {
+function adicionarHistorico() {
     const new_history = document.createElement('li');
     new_history.innerText = last_operation.innerText + ` = ${visor.innerText}`;
-    history.prepend(new_history);
+    history.append(new_history);
+    scroll_down();
+}
+
+function limparHistorico() {
+    history.innerHTML = '';
 }
