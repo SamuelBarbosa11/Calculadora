@@ -6,11 +6,19 @@
         margin-block: 2.5rem 1rem;
     }
     & ul {
-        height: calc(100% - 5.625rem - 2.5rem);
+        height: calc(100% - 5.625rem - 4.75rem);
         overflow: scroll;
+        margin-bottom: .5rem;
     }
 
     & li {
         margin-bottom: .75rem;
+    }
+
+    & #clean-history {
+        padding: 1rem;
+        border-radius: .5rem;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.05) 50%, rgba(129, 126, 206, 0.5) 100%);
+        box-shadow: 0px 11px 7px rgba(0, 0, 0, 0.01), 0px 7px 7px rgba(0, 0, 0, 0.04), 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 2px 4px rgba(0, 0, 0, 0.26), 0px 0px 2px rgba(0, 0, 0, 0.29), inset 0px 2px 3px rgba(255, 255, 255, 0.06);
     }
 }

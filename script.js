@@ -3,8 +3,10 @@ const botoes = document.querySelectorAll('.keybord button');
 const last_operation = document.querySelector('.last-operation p');
 const small_symbols = document.querySelectorAll('.result .symbol');
 const history = document.querySelector('ul.operations');
+const clean_history = document.querySelector('#clean-history');
 
 window.onload = scroll_right();
+
 // mantem o scroll na direita
 function scroll_right() {
     visor.scrollLeft = visor.scrollWidth;
@@ -99,6 +101,10 @@ botoes.forEach(botao => {
         // ============================================================================
     });
 });
+
+clean_history.onclick = function() {
+    limparHistorico();
+}
 
 function adicionarNumero(numero) {
     if (finalizouConta) {
