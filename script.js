@@ -96,6 +96,7 @@ botoes.forEach(botao => {
                 resetarVisor = true;
                 finalizouConta = true;
                 esconderSimbolos();
+                document.querySelector(`.result .symbol.${tipoOperacao}`).classList.remove('hidden');
             }
         }
         // ============================================================================
