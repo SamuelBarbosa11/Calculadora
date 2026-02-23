@@ -5,11 +5,11 @@ const small_symbols = document.querySelectorAll('.result .symbol');
 const history = document.querySelector('ul.operations');
 
 window.onload = scroll_right();
-// mantem o scroll por padrao na extrema direita
+// mantem o scroll na direita
 function scroll_right() {
     visor.scrollLeft = visor.scrollWidth;
 }
-
+// mantem o scroll no final
 function scroll_down() {
     visor.scrollTop = visor.scrollHeight;
 }
@@ -17,42 +17,45 @@ function scroll_down() {
 let primeiroNumero = null;
 let operadorAtual = null;
 let resetarVisor = false;
+let finalizouConta = false;
 
 botoes.forEach(botao => {
     botao.addEventListener('click', () => {
         const textoBotao = botao.innerText;
         const tipoOperacao = botao.getAttribute('operation');
 
-        // Verificar se o botão clicado é um número ou a vírgula
-        if (!isNaN(textoBotao) || textoBotao === ',') { adicionarNumero(textoBotao); }
+        // ========================= Escrever e Apagar =================================
+        if ((!isNaN(textoBotao) && textoBotao.trim() !== "") || textoBotao === ',') {
+            if (finalizouConta) {
+                primeiroNumero = null;
+                operadorAtual = null;
+                finalizouConta = false;
+            }
+            adicionarNumero(textoBotao);
+        }
 
         if (textoBotao === 'C') { apagarDigito(); }
         if (textoBotao === 'CE') { limparVisor(); }
+        // =============================================================================
 
+
+
+        // ========================= Operações ( + , -, *, / ) =========================
         if (tipoOperacao && tipoOperacao !== 'equal') {
-            let textoLimpo = visor.innerText.replace(',', '.');
-            // Se o visor estiver vazio ou for só uma vírgula, assume 0
-            if (textoLimpo === "" || textoLimpo === ".") textoLimpo = "0";
-            
-            const valorAtual = parseFloat(textoLimpo);
+            let textoVisor = visor.innerText.trim();
+            if (textoVisor === "" || textoVisor === ",") textoVisor = "0";
 
-            if (isNaN(valorAtual)) return;
+            const valorNoVisor = parseFloat(textoVisor.replace(',', '.')) || 0;
 
-            if (primeiroNumero !== null && operadorAtual !== null && !resetarVisor) {
-                const resultadoParcial = calcular(primeiroNumero, valorAtual, operadorAtual);
-                
-                // Se o cálculo falhar (ex: divisão por zero), resetamos
-                if (resultadoParcial === "Erro") {
-                    limparVisor();
-                    visor.innerText = "Erro";
-                    return;
-                }
-                
+            if (finalizouConta) {
+                primeiroNumero = valorNoVisor;
+                finalizouConta = false;
+            } else if (primeiroNumero !== null && operadorAtual !== null && !resetarVisor) {
+                const resultadoParcial = calcular(primeiroNumero, valorNoVisor, operadorAtual);
                 visor.innerText = resultadoParcial.toString().replace('.', ',');
                 primeiroNumero = resultadoParcial;
             } else {
-                // Se for a primeira vez, apenas guarda o número do visor
-                primeiroNumero = valorAtual;
+                primeiroNumero = valorNoVisor;
             }
 
             // Define qual é o novo operador
@@ -70,7 +73,11 @@ botoes.forEach(botao => {
             
             resetarVisor = true; // O próximo número digitado deve limpar o visor
         }
+        // ============================================================================
 
+
+
+        // =========================== Operação " = " =================================
         if (tipoOperacao === 'equal') {
             if (primeiroNumero !== null && operadorAtual !== null) {
                 const segundoNumero = parseFloat(visor.innerText.replace(',', '.'));
@@ -82,28 +89,36 @@ botoes.forEach(botao => {
                 adicionarHistorico();
                 
                 // Reseta o estado para uma nova conta
-                primeiroNumero = null;
+                primeiroNumero = resultadoFinal;
                 operadorAtual = null;
                 resetarVisor = true;
+                finalizouConta = true;
                 esconderSimbolos();
             }
         }
+        // ============================================================================
     });
 });
 
 function adicionarNumero(numero) {
+    if (finalizouConta) {
+        primeiroNumero = null;
+        operadorAtual = null;
+        resetarVisor = true;
+
+        finalizouConta = false;
+    }
+
     if (resetarVisor) {
         visor.innerText = (numero === ',' ? '0,' : numero);
         resetarVisor = false;
-        return;
-    }
-
-    if (numero === ',' && visor.innerText.includes(',')) return;
-
-    if (visor.innerText === '0' && numero !== ',') {
-        visor.innerText = numero;
     } else {
-        visor.innerText += numero;
+        if (numero === ',' && visor.innerText.includes(',')) return;
+        if (visor.innerText === '0' && numero !== ',') {
+            visor.innerText = numero;
+        } else {
+            visor.innerText += numero;
+        }
     }
     scroll_right();
 }
@@ -123,6 +138,10 @@ function apagarDigito() {
 function limparVisor() {
     visor.innerText = '0';
     last_operation.textContent = '';
+    primeiroNumero = null;
+    operadorAtual = null;
+    resetarVisor = false;
+    finalizouConta = false;
     esconderSimbolos();
     limparHistorico();
     scroll_right();
