@@ -23,7 +23,8 @@
             align-items: center;
             
             & h1 {
-                overflow: scroll;
+                overflow-x: auto;
+                overflow-y: hidden;
                 max-width: calc(100% - 1.4rem);
                 height: 3.125rem;
             }
